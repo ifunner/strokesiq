@@ -33,6 +33,7 @@ export function NewRoundView(): HTMLElement {
         <label>Course</label>
         <input class="txtinput" id="coursename" placeholder="Search or type a course" />
         <div class="chips" id="course-chips" style="margin-top:10px">${chipsHTML()}</div>
+        <button class="linkbtn" id="editcourse" style="display:none;margin-top:10px;color:var(--path)">Edit pars &amp; yardages →</button>
       </div>
       <div class="field">
         <label>Tee box</label>
@@ -52,9 +53,19 @@ export function NewRoundView(): HTMLElement {
     courseName = nameInput.value;
   });
 
+  const editLink = qs<HTMLButtonElement>('#editcourse', page)!;
+  editLink.addEventListener('click', () => {
+    if (selectedCourse) go({ name: 'courseSetup', id: selectedCourse.id, from: 'newround' });
+  });
+
   qs('#course-chips', page)!.addEventListener('click', (ev) => {
     const chip = (ev.target as HTMLElement).closest<HTMLElement>('.chip');
-    if (!chip || !chip.dataset.id) return;
+    if (!chip) return;
+    if (chip.dataset.new) {
+      go({ name: 'courseSetup', from: 'newround' });
+      return;
+    }
+    if (!chip.dataset.id) return;
     selectedCourse = courses.find((c) => c.id === chip.dataset.id) ?? null;
     courseName = selectedCourse?.name ?? courseName;
     nameInput.value = courseName;
@@ -62,6 +73,7 @@ export function NewRoundView(): HTMLElement {
     qsa('.chip', page).forEach((c) => c.classList.remove('on'));
     chip.classList.add('on');
     qs('#teeseg', page)!.innerHTML = teeSegHTML();
+    editLink.style.display = selectedCourse ? 'inline' : 'none';
   });
 
   qs('#teeseg', page)!.addEventListener('click', (ev) => {
@@ -92,7 +104,7 @@ export function NewRoundView(): HTMLElement {
           `<button class="chip" data-id="${c.id}">${escapeHtml(c.name)}</button>`,
       )
       .join('');
-    return saved || '<span class="emptystate">No saved courses yet — type one above.</span>';
+    return `${saved}<button class="chip" data-new="1">+ New course</button>`;
   }
 
   function activeTees(): (CourseTee | DefaultTee)[] {

@@ -8,6 +8,7 @@ import {
   deleteRound,
   getCourses,
   saveCourse,
+  deleteCourse as deleteCourseFromDb,
 } from './lib/storage/adapter';
 import { buildRound, holeYdsFromCourse } from './lib/sg/round';
 import type {
@@ -23,7 +24,8 @@ export type Route =
   | { name: 'hole' }
   | { name: 'review'; id: string }
   | { name: 'rounds' }
-  | { name: 'more' };
+  | { name: 'more' }
+  | { name: 'courseSetup'; id?: string; from?: 'newround' | 'more' };
 
 export interface DraftMeta {
   courseId: string | null;
@@ -105,9 +107,20 @@ export async function completeOnboarding(handicap: number): Promise<void> {
 
 // --- Courses ---
 
-export async function persistCourse(course: Course): Promise<void> {
+export function getCourse(id: string): Course | undefined {
+  return state.courses.find((c) => c.id === id);
+}
+
+export async function upsertCourse(course: Course): Promise<void> {
   await saveCourse(course);
   state.courses = await getCourses();
+  emit();
+}
+
+export async function removeCourse(id: string): Promise<void> {
+  await deleteCourseFromDb(id);
+  state.courses = await getCourses();
+  emit();
 }
 
 // --- Live round draft ---
@@ -230,8 +243,3 @@ export function editRound(round: Round): void {
 }
 
 let editingId: string | null = null;
-export function consumeEditingId(): string | null {
-  const id = editingId;
-  editingId = null;
-  return id;
-}

@@ -8,6 +8,7 @@ import { HoleEntryView } from './views/holeEntry';
 import { RoundReviewView } from './views/roundReview';
 import { RoundsView } from './views/rounds';
 import { MoreView } from './views/more';
+import { CourseSetupView } from './views/courseSetup';
 
 const TAB_FOR: Record<Route['name'], 'home' | 'rounds' | 'more'> = {
   home: 'home',
@@ -16,6 +17,7 @@ const TAB_FOR: Record<Route['name'], 'home' | 'rounds' | 'more'> = {
   review: 'rounds',
   rounds: 'rounds',
   more: 'more',
+  courseSetup: 'home',
 };
 
 export async function initApp(root: HTMLElement): Promise<void> {
@@ -75,5 +77,6 @@ function viewFor(route: Route): HTMLElement {
     case 'review': return RoundReviewView(route.id);
     case 'rounds': return RoundsView();
     case 'more': return MoreView();
+    case 'courseSetup': return CourseSetupView(route.id, route.from);
   }
 }

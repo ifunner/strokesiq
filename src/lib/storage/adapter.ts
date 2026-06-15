@@ -79,6 +79,11 @@ export async function saveCourse(course: Course): Promise<void> {
   await db.put('courses', course);
 }
 
+export async function deleteCourse(id: string): Promise<void> {
+  const db = await getDB();
+  await db.delete('courses', id);
+}
+
 // --- Rounds ---
 
 export async function getRounds(): Promise<Round[]> {

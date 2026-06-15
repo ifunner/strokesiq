@@ -18,8 +18,11 @@ import { MoreView } from './views/more';
 import { NewRoundView } from './views/newRound';
 import { RoundReviewView } from './views/roundReview';
 import { HoleEntryView } from './views/holeEntry';
+import { CourseSetupView } from './views/courseSetup';
 import { initApp } from './app';
 import { _resetForTests } from './lib/storage/adapter';
+import { upsertCourse } from './store';
+import { buildCourse } from './lib/course';
 
 function wipe(): Promise<void> {
   return new Promise((resolve) => {
@@ -119,6 +122,42 @@ describe('full round flow', () => {
     // Rounds list shows the round.
     const list = RoundsView();
     expect(list.querySelectorAll('.rrow').length).toBe(1);
+  });
+});
+
+describe('course setup', () => {
+  it('renders a create form with 18 hole rows', async () => {
+    await loadAll();
+    const el = CourseSetupView();
+    expect(el.textContent).toContain('New course');
+    expect(el.querySelectorAll('.crow').length).toBe(18);
+  });
+
+  it('shows saved courses in New Round and More after upsert', async () => {
+    await loadAll();
+    const pars = [4, 5, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 3, 4, 4, 5, 3, 4] as (3 | 4 | 5)[];
+    const course = buildCourse({
+      name: 'Glen Abbey',
+      teeName: 'Blue',
+      holePars: pars,
+      holeYds: pars.map((p) => (p === 5 ? 540 : 0)),
+    });
+    await upsertCourse(course);
+
+    expect(getState().courses).toHaveLength(1);
+    // New Round lists the saved course as a chip (plus the "+ New course" chip).
+    const nr = NewRoundView();
+    expect(nr.textContent).toContain('Glen Abbey');
+    expect(nr.textContent).toContain('New course');
+    // More lists it under Courses with a par-5 yardage summary.
+    const more = MoreView();
+    expect(more.textContent).toContain('Glen Abbey');
+    expect(more.textContent).toContain('par-5 yardages');
+
+    // Editing renders the form pre-filled with the saved name.
+    const edit = CourseSetupView(course.id, 'more');
+    expect(edit.textContent).toContain('Edit course');
+    expect(edit.querySelector<HTMLInputElement>('#cname')?.value).toBe('Glen Abbey');
   });
 });
 

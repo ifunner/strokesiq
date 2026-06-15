@@ -425,6 +425,31 @@ button.block {
 .txtinput::placeholder {
   color: var(--sage);
 }
+/* Native date input: stop WebKit's intrinsic min-width + default inner styling
+   from overflowing the rounded box on dark surfaces. */
+input[type='date'].txtinput {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 44px;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+input[type='date'].txtinput::-webkit-date-and-time-value {
+  text-align: left;
+  margin: 0;
+}
+input[type='date'].txtinput::-webkit-datetime-edit {
+  padding: 0;
+}
+/* Recolor the calendar picker icon so it's visible (and inside) on dark felt. */
+input[type='date'].txtinput::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
+  opacity: 0.7;
+  cursor: pointer;
+  margin-left: 4px;
+}
 
 /* segmented */
 .seg {
@@ -747,6 +772,70 @@ details .body b {
   color: var(--ink-dim);
   font-size: 13px;
   line-height: 1.5;
+}
+
+/* course setup rows */
+.crow {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.crow:last-child {
+  border-bottom: none;
+}
+.crow .top {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+.crow .hn {
+  color: var(--ink-dim);
+  font-size: 13px;
+  text-align: center;
+}
+.crow .cpar {
+  display: flex;
+  gap: 6px;
+}
+.crow .cpar button {
+  flex: 1;
+  padding: 7px 0;
+  font-size: 13px;
+}
+.crow .cpar button.on {
+  background: var(--flag);
+  border-color: var(--flag);
+  color: #1a1500;
+}
+.crow .cyd {
+  margin-top: 8px;
+  padding-left: 42px;
+}
+
+/* update banner (new version available) */
+.updatebar {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  z-index: 75;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--panel-hi);
+  border: 1px solid var(--flag);
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 10px 12px 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 8px 24px -16px #000;
+  max-width: calc(100% - 28px);
+}
+.updatebar button {
+  padding: 7px 12px;
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 /* modal */

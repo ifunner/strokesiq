@@ -1,71 +1,35 @@
 # StrokesIQ
 
-A golf-intelligence PWA in the GolfIQ suite. It answers one question:
-**where did my strokes go, and what do I practice next?**
+A golf-intelligence PWA in the **GolfIQ suite**. It answers one question: **where did my strokes go, and what do I practice next?**
 
-StrokesIQ scores every shot against **strokes gained** (Level 2: driving,
-approach, short game, putting), names your biggest leak, and projects your
-**Scoring Potential**. Local-first, offline, installable — no account, no server.
+StrokesIQ scores every shot against **strokes gained** (driving, approach, short game, putting), names your **biggest leak**, and projects your **scoring potential**. Local-first, offline, installable — no account, no server.
 
-See [`docs/StrokesIQ-build-spec.md`](docs/StrokesIQ-build-spec.md) for the full
-product spec and [`docs/strokesiq-prototype.html`](docs/strokesiq-prototype.html)
-for the original visual reference.
+**Live app → [ifunner.github.io/strokesiq](https://ifunner.github.io/strokesiq/)**
 
-## Tech
+---
 
-- **Vite 6 + TypeScript** (vanilla, no UI framework) — small bundle, fast on cellular
-- **IndexedDB** via [`idb`](https://github.com/jakearchibald/idb) for local-first storage
-- **vite-plugin-pwa** (Workbox) for offline app-shell caching + install
-- **Vitest** for the strokes-gained engine and storage tests
+## What it does
 
-## Project layout
+Log a round hole by hole — distances, lies, misses — and StrokesIQ shows where you gained and lost strokes vs scratch. After a few rounds it calls your **biggest leak** (the category costing you the most) and your **scoring potential** (where your game is headed if trends hold).
 
-```
-src/
-  lib/
-    sg/         strokes-gained engine, expected-strokes tables, types, tests
-    storage/    IndexedDB adapter + JSON backup/restore (shapes mirror future Supabase)
-    copy/       dynamic leak + recommendation templates (the future "AI review" seam)
-  components/   sgBars, dispersionPad cells, handicap sheet, brand icons
-  views/        Home, NewRound, HoleEntry, RoundReview, Rounds, More
-  store.ts      in-memory state + live-round draft
-  app.ts        shell: router, tab bar, header
-public/icons/   PWA icons (copied from strokesiq-logo/)
-```
+Use it to decide what to practice next, not to stare at a spreadsheet. Imperial units for MVP; your data stays on your phone.
 
-The engine in `src/lib/sg/` has **zero UI dependencies** and is the load-bearing
-module — start there when changing how strokes are valued.
+## GolfIQ suite
 
-## Develop
+StrokesIQ is the **diagnosis side** of GolfIQ — where your strokes actually go.
 
-```bash
-npm install
-npm run dev        # http://localhost:5173
-npm run dev:host   # expose on your LAN to test install on a phone
-```
+- **[PracticeIQ](https://ifunner.github.io/practiceiq/)** — practice planner and session logger; builds routines around your leak.
+- **[GreenIQ](https://ifunner.github.io/greeniq/)** — green reading and putting trainer; aim, pace, and feel on the practice green.
 
-## Test & build
+## Install on your phone
 
-```bash
-npm test           # Vitest (engine + storage)
-npm run typecheck  # tsc --noEmit
-npm run build      # tsc + vite build → dist/  (also writes 404.html for SPA fallback)
-```
-
-## Deploy (GitHub Pages)
-
-Push to `main`; the workflow in `.github/workflows/deploy.yml` runs tests,
-builds, and deploys. `vite.config.ts` derives the Pages base path from
-`GITHUB_REPOSITORY`, so the repo name (`strokesiq`) sets the URL automatically.
-
-Install + offline require HTTPS — open the published `https://…` URL in Safari
-(iOS) or Chrome (Android), then **Add to Home Screen**.
+1. Open **[ifunner.github.io/strokesiq](https://ifunner.github.io/strokesiq/)** in Safari (iOS) or Chrome (Android).
+2. Share → **Add to Home Screen**.
+3. Launch from the home-screen icon — full-screen and offline after first load.
 
 ## Back up your data
 
-iOS can evict an unused web app's storage. **More → Export backup** saves a JSON
-file; **Import backup** restores it (merge or replace) and is also how you move
-data between devices.
+iOS can evict an unused web app's storage. **More → Export backup** saves a JSON file; **Import backup** restores it (merge or replace) and moves data between devices.
 
 ## Key product decisions (MVP)
 
@@ -80,8 +44,57 @@ data between devices.
 | Units | Imperial for MVP (metric deferred; shape retained) |
 | Rounds | Editable and deletable |
 
-## Roadmap (architected for, not built)
+---
 
-Supabase auth + sync (storage shapes are ready), golf-course API lookup, official
-handicap tracking, LLM-generated round reviews (replacing `lib/copy/`),
-PracticeIQ handoff, GreenIQ putting import, and optional Level 3 shot-by-shot.
+## For developers
+
+Vite 6 + TypeScript (vanilla, no UI framework). See [`docs/StrokesIQ-build-spec.md`](docs/StrokesIQ-build-spec.md) for the full product spec and [`docs/strokesiq-prototype.html`](docs/strokesiq-prototype.html) for the original visual reference.
+
+### Tech
+
+- **IndexedDB** via [`idb`](https://github.com/jakearchibald/idb) for local-first storage
+- **vite-plugin-pwa** (Workbox) for offline app-shell caching + install
+- **Vitest** for the strokes-gained engine and storage tests
+
+### Project layout
+
+```
+src/
+  lib/
+    sg/         strokes-gained engine, expected-strokes tables, types, tests
+    storage/    IndexedDB adapter + JSON backup/restore
+    copy/       dynamic leak + recommendation templates
+  components/   sgBars, dispersionPad cells, handicap sheet, brand icons
+  views/        Home, NewRound, HoleEntry, RoundReview, Rounds, More
+  store.ts      in-memory state + live-round draft
+  app.ts        shell: router, tab bar, header
+public/icons/   PWA icons (from strokesiq-logo/)
+```
+
+The engine in `src/lib/sg/` has **zero UI dependencies** — start there when changing how strokes are valued.
+
+### Develop
+
+```bash
+npm install
+npm run dev        # http://localhost:5173
+npm run dev:host   # LAN — test install on a phone
+```
+
+### Test & build
+
+```bash
+npm test           # Vitest (engine + storage)
+npm run typecheck  # tsc --noEmit
+npm run build      # tsc + vite build → dist/
+```
+
+### Deploy (GitHub Pages)
+
+Push to `main`; `.github/workflows/deploy.yml` runs tests, builds, and deploys. `vite.config.ts` sets the Pages base path from `GITHUB_REPOSITORY` (`/strokesiq/`).
+
+Design tokens and cross-suite UI rules: [`golfiq-design`](https://github.com/ifunner/golfiq-design) · [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md).
+
+### Roadmap (architected for, not built)
+
+Supabase auth + sync, golf-course API lookup, official handicap tracking, LLM-generated round reviews (replacing `lib/copy/`), PracticeIQ handoff, GreenIQ putting import, optional Level 3 shot-by-shot.

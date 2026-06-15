@@ -1,15 +1,17 @@
 # GolfIQ Design System
 
-The GolfIQ design language is built for golf tools that feel like premium course-side instruments: dark felt greens, warm ivory type, and a single flag-yellow accent for the moments that matter (aim point, cup, primary action). **GreenIQ** is the reference implementation; **PracticeIQ** and other suite apps follow the same tokens, hierarchy, and component rules documented here.
+The GolfIQ design language is built for golf tools that feel like premium course-side instruments: dark felt greens, warm ivory type, and a single flag-yellow accent for the moments that matter (aim point, cup, primary action). **GreenIQ** is the reference implementation; **StrokesIQ** and **PracticeIQ** follow the same tokens, hierarchy, and component rules documented here.
+
+> **Source of truth.** This document and the shared `golfiq.css` live in the `golfiq-design-system/` package. Each app vendors a synced copy — never hand-edit a vendored `golfiq.css` or a per-repo `DESIGN_SYSTEM.md`. Edit them in `golfiq-design-system/` and run `npm run sync`. See that package's README for the workflow. Where GreenIQ's shipped CSS and this spec ever disagree, **GreenIQ wins** for look-and-feel; this doc is kept in sync to match.
 
 ---
 
 ## Design principles
 
 1. **Instrument, not decoration** — UI reads like a caddie’s yardage book: dense data, clear hierarchy, no visual noise.
-2. **One pop color** — Flag yellow (`--flag`) is reserved for aim, cup, and primary CTAs. Never use it as ambient decoration.
+2. **One pop color** — Flag yellow (`--flag`) is reserved for aim, cup, and primary CTAs. Never use it as ambient decoration (this is why toasts are neutral chrome, not yellow).
 3. **Mobile-first, thumb-zone aware** — Single-column layout, fixed tab bar, safe-area insets, max width 520px.
-4. **Data is monospace** — Measurements, percentages, and scores use tabular mono numerals; labels and navigation use Space Grotesk.
+4. **Data is monospace** — Measurements, percentages, and scores use tabular mono numerals; labels and navigation use Space Grotesk. The whole suite uses the system monospace stack.
 5. **Offline-ready calm** — Dark surfaces, subtle depth, minimal motion. Respects `prefers-reduced-motion`.
 
 ---
@@ -18,14 +20,14 @@ The GolfIQ design language is built for golf tools that feel like premium course
 
 ### CSS custom properties
 
-All tokens live on `:root` (GreenIQ: `styles.css`; suite apps: inline in `index.html` or shared stylesheet).
+All tokens live on `:root` in `golfiq.css`.
 
 | Token | Hex | Role |
 |---|---|---|
-| `--felt` | `#0E2A22` | Primary surface, PWA `theme_color` |
-| `--felt-deep` | `#0A201A` | Deepest background, stepper wells, bar tracks |
+| `--felt` | `#0E2A22` | Primary surface, PWA manifest `theme_color` |
+| `--felt-deep` | `#0A201A` | Deepest background, HTML `theme-color` meta, stepper wells, bar tracks |
 | `--panel` | `#10322A` | Card and sheet backgrounds |
-| `--panel-hi` | `#143a30` | Default button fill, elevated panel |
+| `--panel-hi` | `#143a30` | Default button fill, elevated panel, toast |
 | `--ink` | `#F2EBDA` | Primary text (ivory) |
 | `--ink-dim` | `#9DB3A6` | Secondary text, hints, inactive tabs |
 | `--sage` | `#6E8F7E` | Labels, eyebrows, tertiary UI |
@@ -36,8 +38,6 @@ All tokens live on `:root` (GreenIQ: `styles.css`; suite apps: inline in `index.
 | `--uphill` | `#7FC8FF` | Supplementary accent (finger read hint) |
 
 ### Brand aliases (logo / light surfaces)
-
-From `greeniq-logo/README.md`:
 
 | Alias | Hex | Notes |
 |---|---|---|
@@ -63,9 +63,9 @@ From `greeniq-logo/README.md`:
 
 ### Background treatment
 
-The page background is a **single, gradual radial gradient** over `--felt-deep`. The effect should read as a soft top-light that slowly deepens over the full viewport — never as a visible band or horizontal cut-off behind the header or first card.
+The page background is a **single, gradual radial gradient** over `--felt-deep`. The effect reads as a soft top-light that deepens toward the tab-bar zone — never as a visible band or horizontal cut-off behind the header or first card.
 
-**Canonical recipe:**
+**Canonical recipe (GreenIQ):**
 
 ```css
 html { background: var(--felt-deep); }
@@ -74,9 +74,9 @@ body {
   min-height: 100vh;
   background-color: var(--felt-deep);
   background-image: radial-gradient(
-    120% 95% at 50% -10%,
+    120% 60% at 50% -10%,
     #16382d 0%,
-    var(--felt) 52%,
+    var(--felt) 42%,
     var(--felt-deep) 100%
   );
   background-attachment: fixed;
@@ -86,10 +86,10 @@ body {
 | Property | Value | Why |
 |---|---|---|
 | Ellipse width | `120%` | Wide, even wash across the column |
-| Ellipse height | `95%` | Tall falloff — gradient spans most of the viewport |
+| Ellipse height | `60%` | Light pools near the top and settles to base by mid-page |
 | Origin | `50% -10%` | Light source above the viewport top |
 | Highlight | `#16382d` | Slightly lifted green; do not go brighter |
-| Mid stop | `var(--felt)` at `52%` | Holds mid-tone longer before deepening |
+| Mid stop | `var(--felt)` at `42%` | Holds the mid-tone through the first cards |
 | Base | `var(--felt-deep)` at `100%` | Anchors bottom and tab-bar zone |
 | Attachment | `fixed` | Pins gradient to the viewport on scroll |
 
@@ -98,11 +98,10 @@ body {
 - Stack multiple gradients (radial + linear) — causes banding and hard edges
 - Use more than three color stops on the page background
 - Paint the header with a solid `--felt-deep` scrim — it creates a prominent dark line over the gradient
-- Let the radial complete to `--felt-deep` too early (keep height ≥ `90%`)
 
-GreenIQ header scrolls with content (`background: transparent`). Suite apps may use `position: sticky` on the header, but the header background must stay **transparent** so the page gradient shows through.
+The header background must stay **transparent** so the page gradient shows through, whether the header scrolls with content (GreenIQ) or is `position: sticky` (suite apps).
 
-Special card variant `.read` (GreenIQ) / `.metric.hero` (PracticeIQ) uses a darker inset gradient:
+Special card variant `.read` / `.card.read` (and PracticeIQ `.metric.hero`) uses a darker inset gradient:
 
 ```css
 background: linear-gradient(180deg, #0c2820, #0a221b);
@@ -135,22 +134,23 @@ border-color: #2c5446;
 | Role | Family | Weights loaded |
 |---|---|---|
 | **Display / UI** | `'Space Grotesk', ui-sans-serif, system-ui, sans-serif` | 500, 700 |
-| **Data / metrics** | `ui-monospace, "SF Mono", Menlo, Consolas, monospace` | — |
-| **Suite data (PracticeIQ)** | `'JetBrains Mono', ui-monospace, monospace` | 400, 500, 700 — **numbers only** |
+| **Data / metrics (whole suite)** | `ui-monospace, "SF Mono", Menlo, Consolas, monospace` | — |
 | **Fallback body** | `ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif` | — |
 
-Space Grotesk applies to: `.brand h1`, `.card h2`, `summary`, `.tabbar button`, `.sect`, `.eyebrow`, `label.f`, nav labels.
+> The suite uses the **system monospace stack** for all data/metrics. (PracticeIQ formerly shipped JetBrains Mono; it was unified to system mono so the apps read identically.)
 
-Monospace applies to: `.mono`, stepper inputs, `.readout-slope`, `.bigval`, chips’ numeric values, insight stats, timers, counters, dates. **Do not** set structural labels, section titles, or nav text in mono.
+Space Grotesk applies to: `.brand h1` / `.brand .wm`, `.card h2`, `summary`, `.tabbar button`, `.sect` / `.seclabel`, `.eyebrow`, `label.f` / `.field label`, nav labels.
+
+Monospace applies to: `.mono`, stepper inputs, `.readout-slope`, `.bigval`, chips’ numeric values, insight stats, timers, counters, dates, scores. **Do not** set structural labels, section titles, or nav text in mono.
 
 ### Type scale
 
 | Class / element | Size | Weight | Tracking | Transform | Color |
 |---|---|---|---|---|---|
-| `.brand h1` | 21px | 500 / 700 split | −0.028em | — | `--ink` / `--path` |
+| `.brand h1` / `.brand .wm` | 21px | 500 / 700 split | −0.028em | — | `--ink` / `--path` |
 | `.pill` | 10px | 800 | 0.16em | uppercase | `--felt-deep` on `--flag` |
-| `.eyebrow` | 11px | 600 | 0.22em | uppercase | `--sage` |
-| `.card h2` | 13px | (700 via summary) | 0.04em | — | `--ink` |
+| `.eyebrow` / `.seclabel` | 11px | 600 | 0.22em | uppercase | `--sage` |
+| `.card h2` | 13px | 700 | 0.04em | — | `--ink` |
 | `.card h2 .num` | 12px | mono | — | — | `--flag` |
 | `.readout-slope` | 40px (+ 18px unit) | 600 | −0.02em | — | `--ink` / `--ink-dim` |
 | `.bigval` | 34px (+ 15px unit) | 600 | −0.02em | — | `--ink` or `--flag` in `.aimcol` |
@@ -167,16 +167,16 @@ Monospace applies to: `.mono`, stepper inputs, `.readout-slope`, `.bigval`, chip
 ### Wordmark
 
 ```
-Green  →  Space Grotesk 500, color: --ink
-IQ     →  Space Grotesk 700, color: --path
+<Prefix>  →  Space Grotesk 500, color: --ink     (Green / Strokes / Practice)
+IQ        →  Space Grotesk 700, color: --path
 ```
 
-Letter-spacing: `−0.028em`. Prefer live HTML/SVG lockup over raster logos.
+Letter-spacing: `−0.028em`. "IQ" is always `--path` green. Prefer live HTML/SVG lockup over raster logos.
 
 ### Numeric conventions
 
 - Use `font-variant-numeric: tabular-nums` on `.mono`.
-- Slope: one decimal + `%`.
+- Slope: one decimal + `%`. Strokes gained: one decimal with explicit sign.
 - Aim/pace: one decimal in imperial; metric rounds to whole cm where shown.
 - Percentages in insights: whole numbers.
 
@@ -206,7 +206,7 @@ The layout uses a **4px implicit grid** with common steps at 6, 8, 9, 10, 11, 12
 | Component | Padding / gap |
 |---|---|
 | Button default | `9px 12px` |
-| Button small (header) | `5px 10px` |
+| Button small (`.sm`) | `5px 10px` |
 | Tab bar | `6px 8px` + bottom safe area |
 | Tab item | `7px 0`, icon gap `3px` |
 | Stepper side buttons | `38px` wide |
@@ -215,7 +215,7 @@ The layout uses a **4px implicit grid** with common steps at 6, 8, 9, 10, 11, 12
 | Modal sheet | `18px` |
 | Accordion summary | `14px 15px` |
 | Accordion body | `0 15px 15px` |
-| Verdict callout | `10px 12px` |
+| Verdict callout | `11px 13px` |
 | Toast | `10px 16px` |
 
 ### Layout width
@@ -225,7 +225,7 @@ max-width: 520px;
 margin: 0 auto;
 ```
 
-Portrait-only PWA (`manifest.webmanifest`: `"orientation": "portrait"`).
+Portrait-only PWA (`manifest`: `"orientation": "portrait"`).
 
 ---
 
@@ -254,9 +254,11 @@ transition: transform 0.04s ease, background 0.15s, border-color 0.15s;
 |---|---|---|---|---|
 | *(default)* | `--panel-hi` | `--line` | `--ink` | Secondary actions |
 | `.primary` | `--flag` | `--flag` | `#1a1500` | Main CTA per section |
-| `.live` | `--path` | `--path` | `#04140c` | Sensor active state |
+| `.live` (alias `.path`) | `--path` | `--path` | `#04140c` | Sensor active / success state |
 | `.ghost` | `transparent` | `--line` | `--ink` | Tertiary, cancel, toggle off |
+| `.danger` | `transparent` | `--red` | `--red` | Destructive (delete) |
 | `.sm` | — | — | — | Compact padding: `5px 10px`; use with any variant |
+| `.block` | — | — | — | Full-width CTA: `width:100%`, `13px` padding, `14px`/700 |
 | `.made` (log row) | default | `#2c5446` | `--path` | Successful putt log |
 
 ### Button groups (`.btnrow`)
@@ -268,11 +270,9 @@ flex-wrap: wrap;
 margin-top: 11px;
 ```
 
-Grain selector and card footers use `.btnrow` with one `.primary` selected, others `.ghost`.
-
 ### Segmented control (`.seg`)
 
-Inline toggle for mutually exclusive options (e.g. inches vs fingers):
+Inline toggle for mutually exclusive options:
 
 ```css
 display: inline-flex;
@@ -294,7 +294,7 @@ Nested inside `.stepper` — borderless, `38px` wide, `font-size: 19px`, color `
 ### Standard card (`.card`)
 
 ```css
-background: linear-gradient(180deg, var(--panel) 0%, var(--panel) 100%);
+background: var(--panel);
 border: 1px solid var(--line);
 border-radius: var(--r); /* 16px */
 padding: 15px;
@@ -308,15 +308,13 @@ box-shadow:
 
 - Flex row, `gap: 8px`, `margin-bottom: 12px`
 - Optional numbered badge (`.num`): mono, `--flag` text, `1px` border `--line`, `border-radius: 6px`, `padding: 2px 6px`
-- Alternate badges use semantic colors (patterns = `--red`, trainer = `--path`, feel = `--uphill`)
+- Alternate badges use semantic colors (`.num.red` patterns, `.num.path` trainer)
 
-### Hero read card (`.card.read`)
+### Hero read card (`.card.read` / `.read`)
 
-Darker treatment to elevate “Your read” above setup cards. Aim column (`.aimcol`) tints `.bigval` with `--flag`.
+Darker treatment to elevate the primary output above setup cards. Aim column (`.aimcol`) tints `.bigval` with `--flag`.
 
 ### Accordion (native `<details>`)
-
-Card-like container with expandable body:
 
 - Same border/radius as cards
 - Summary: `font-size: 13px`, `font-weight: 700`, `padding: 14px 15px`
@@ -325,11 +323,7 @@ Card-like container with expandable body:
 
 ### Modal sheet (`.sheet`)
 
-Floating card inside modal:
-
-- `border-radius: 18px` (slightly larger than `--r`)
-- `padding: 18px`
-- `max-width: 380px`
+- `border-radius: 18px`, `padding: 18px`, `max-width: 380px`
 
 ---
 
@@ -339,17 +333,15 @@ Floating card inside modal:
 
 ```html
 <div class="field">
-  <label>Label <span class="u-inline">(unit)</span></label>
+  <label>Label <span class="u">(unit)</span></label>
   <!-- control -->
 </div>
 ```
 
 - Label: uppercase sage, `11px`, `letter-spacing: 0.04em`
-- `.u-inline`: normal case, `--ink-dim`, weight 500 — for units in parentheses
+- `.u` / `.u-inline`: normal case, `--ink-dim`, weight 500 — for units in parentheses
 
 ### Stepper (numeric input)
-
-Primary numeric control pattern:
 
 ```
 [ − ] [ centered mono value ] [ + ]
@@ -365,27 +357,19 @@ Primary numeric control pattern:
 }
 ```
 
-Input: centered mono, `17px`, weight 600, no focus outline (custom UI). Hidden `.unit` span for semantics.
+Input: centered mono, `17px`, weight 600, no focus outline. `.stepper.big` enlarges to `24px` input / `52px` buttons for modal capture.
 
 ### Range slider
 
 ```css
-input[type=range] {
-  width: 100%;
-  accent-color: var(--flag);
-  margin: 6px 0 0;
-}
+input[type=range] { width: 100%; accent-color: var(--flag); margin: 6px 0 0; }
 ```
 
-Used for: manual slope, trainer guess, feel trainer guess.
+### Text input (`.txtinput`)
 
-### Text input (inline)
-
-Course name uses stepper shell with left-aligned text: `font-size: 14px`, `padding-left: 12px`.
+Full-width on `--felt-deep`, `border-radius: 11px`, `--flag` focus border.
 
 ### Chip selectors (`.chips` / `.chip`)
-
-Saved course pills — selectable, dismissible:
 
 ```css
 .chip {
@@ -398,7 +382,7 @@ Saved course pills — selectable, dismissible:
 }
 ```
 
-Numeric value in chip: mono, `--flag`. Dismiss `×`: `--ink-dim`.
+Numeric value in chip: mono, `--flag`. Active (`.on`): `--flag` fill. Dismiss `×`: `--ink-dim`.
 
 ### Form layout
 
@@ -411,8 +395,6 @@ Numeric value in chip: mono, `--flag`. Dismiss `×`: `--ink-dim`.
 
 ### Fixed tab bar (`.tabbar`)
 
-Bottom navigation for primary app sections (Read · Train · More):
-
 | Property | Value |
 |---|---|
 | Position | `fixed`, bottom, full width, `z-index: 40` |
@@ -421,29 +403,17 @@ Bottom navigation for primary app sections (Read · Train · More):
 | Border | `1px solid var(--line)` top |
 | Safe area | `padding-bottom: calc(8px + env(safe-area-inset-bottom))` |
 
-**Tab button:**
-
-- Column layout: icon (`21×21` SVG, stroke `1.9`, round caps) + label
-- Default: `--ink-dim`
-- Active (`.on`): `--flag`
-- No background fill; `border-radius: 12px`
+**Tab button:** column layout, icon (`21×21` SVG, stroke `1.9`, round caps) + label. Default `--ink-dim`; active (`.on`) `--flag`; no background fill; `border-radius: 12px`.
 
 ### Page switching (`.page`)
 
-- Only one `.page.on` visible at a time
-- Switching scrolls to top
-- Entry animation: `pgin` 0.18s ease (see Animations)
+- Only one `.page.on` visible at a time; switching scrolls to top.
+- Entry animation: `pgin` 0.18s ease.
 
 ### Header
 
-- Brand lockup left (mark + wordmark)
-- Utility cluster right: unit toggle (`.ghost` small button) + `.pill` badge (GreenIQ)
-- **GreenIQ:** scrolls with content, `background: transparent`
-- **Suite apps (e.g. PracticeIQ):** may use `position: sticky; background: transparent` — never a solid `--felt-deep` overlay on the header
-
-### In-card navigation
-
-Secondary flows use ghost text buttons with arrow suffix (`Find green speed →`) rather than links.
+- Brand lockup left (mark + wordmark); utility cluster right.
+- Background stays **transparent** (scrolls with content or sticky) — never a solid `--felt-deep` overlay.
 
 ---
 
@@ -456,8 +426,7 @@ Secondary flows use ghost text buttons with arrow suffix (`Find green speed →`
   from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: none; }
 }
-.page { animation: pgin 0.18s ease; }       /* GreenIQ */
-.view-in { animation: pgin 0.18s ease; }  /* suite apps */
+.page { animation: pgin 0.18s ease; }
 ```
 
 ### Button press
@@ -482,17 +451,10 @@ Secondary flows use ghost text buttons with arrow suffix (`Find green speed →`
   opacity: 0;
   transition: 0.25s;
 }
-.toast.on {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
+.toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
 ```
 
-Auto-dismiss ~1.6s. Do not use `--flag` or `--path` for toast fills — toasts are neutral chrome, not primary actions.
-
-### Blur reveal (Feel Trainer)
-
-`.blurred { filter: blur(12px); transition: filter 0.2s; }` — hides live readout until user commits a guess.
+Auto-dismiss ~1.6–1.8s. **Toasts are neutral chrome** (`--panel-hi`) — never `--flag` or `--path` fills, per "one pop color."
 
 ### Reduced motion
 
@@ -513,77 +475,7 @@ Auto-dismiss ~1.6s. Do not use `--flag` or `--path` for toast fills — toasts a
 
 ## Charts & data visualization
 
-GreenIQ renders charts as **inline SVG** (no chart library). Follow these conventions for GolfIQ data views.
-
-### Putt schematic (top-down read)
-
-ViewBox: `320 × 220`. Dynamic scaling with padding: `padX 34`, `padTop 22`, `padBot 30`.
-
-| Element | Stroke / fill | Width | Style |
-|---|---|---|---|
-| Center line | `--line` | 1 | dashed `3 5` |
-| Ball path | `--path` | 2.6 | round caps/joins |
-| Start line / aim | `--flag` | 1.4 | dashed `2 4`, opacity 0.85 |
-| Fall line (downhill) | `--sage` | 2 | arrow marker |
-| Hole ring | `--ink` | 2 | fill none, r=6.2 |
-| Hole center | `--ink` | — | r=2 fill |
-| Aim point | `--flag` | — | r=4.5 fill |
-| Ball | `#fff` | — | r=4.5 fill |
-| Labels | `--sage` / `--flag` / `--ink-dim` | — | `font-size: 9` |
-
-**Legend (`.legend`):** 9×9px swatches, `border-radius: 2px`, `11px` `--ink-dim` labels.
-
-### Level bubble (slope gauge)
-
-ViewBox: `128 × 128`. Concentric circles and crosshairs in `--line` on `#0a1f19` fill. Bubble color reflects state:
-
-| State | Bubble color |
-|---|---|
-| Locked | `--flag` |
-| Live sensor | `--path` |
-| Manual / idle | `--sage` |
-
-Bubble: r=9, opacity 0.9, white ring at 25% opacity.
-
-### Direction clock dial
-
-ViewBox: `118 × 118`. 12 ticks, `--line` stroke 1.5. Center dot `--sage`. Direction arrow: `--flag`, stroke-width 3, round cap; endpoint circle r=6. Labels “HOLE” / “YOU” in `--ink-dim`, 8.5px.
-
-### Insight bar charts (`.bar`)
-
-Horizontal progress bars for make rates:
-
-```css
-.bar {
-  height: 8px;
-  background: var(--felt-deep);
-  border: 1px solid var(--line);
-  border-radius: 99px;
-  overflow: hidden;
-}
-.bar i {
-  display: block;
-  height: 100%;
-  background: var(--path);
-  /* width set inline as percentage */
-}
-```
-
-Paired with `.insight-line`: flex space-between, `12.5px`, label `--ink-dim`, value mono `--ink`.
-
-### Verdict panel (`.verdict`)
-
-Insight callout with accent rail:
-
-```css
-border: 1px solid var(--line);
-border-left: 3px solid var(--flag);
-border-radius: 8px;
-font-size: 13px;
-line-height: 1.5;
-```
-
-Use for actionable pattern diagnosis (miss bias, pace trends).
+Charts render as **inline SVG** (no chart library). Max 3 hues per diagram plus neutrals.
 
 ### Chart color rules
 
@@ -592,58 +484,22 @@ Use for actionable pattern diagnosis (miss bias, pace trends).
 3. **Sage = gravity** — fall lines, downhill indicators, chart annotations.
 4. **Never rainbow** — max 3 hues per diagram plus neutrals.
 
----
+### Insight bar charts (`.bar`)
 
-## Layout patterns
-
-### App shell
-
-```
-┌─────────────────────────────┐
-│ Header (brand + utilities)  │
-├─────────────────────────────┤
-│                             │
-│  .page (scrollable content) │
-│    └─ stacked .card sections│
-│                             │
-├─────────────────────────────┤
-│ .tabbar (fixed)             │
-└─────────────────────────────┘
+```css
+.bar { height: 8px; background: var(--felt-deep); border: 1px solid var(--line); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--path); }
 ```
 
-### Numbered workflow cards (Read tab)
+### Verdict panel (`.verdict`)
 
-Sequential cards `1 → 2 → 3` guide setup, then a hero `.read` card outputs aim + pace + schematic. Number badges reinforce order without a stepper UI.
-
-### Split readout grids
-
-| Pattern | Grid | Left | Right |
-|---|---|---|---|
-| `.reader` | `128px 1fr` | Level gauge SVG | Slope % + direction |
-| `.clockwrap` | `118px 1fr` | Direction dial | Help text |
-| `.readgrid` | `1fr 1fr` | Aim column (`.aimcol`) | Pace column |
-
-Eyebrow label → `.bigval` → `.subline` → `.callout` forms a consistent metric stack.
-
-### Trainer flow (state machine in a card)
-
-Each trainer card cycles **Idle → Quiz → Result** via `display: none/block`:
-
-- Idle: hint copy + single `.primary` CTA + stats hint
-- Quiz: scenario + segmented format + range input + primary/ghost actions
-- Result: `.readgrid` comparison + verdict `.callout` + next/done buttons
-
-### Log row (`.logrow`)
-
-Full-width label, then equal-width buttons in a flex row — optimized for quick thumb logging after a putt.
-
-### Modal pattern
-
-Full-viewport `.modal` flex-centers `.sheet`. Scrim click or ghost cancel closes. Primary action applies data then dismisses.
-
-### More tab
-
-Accordion-only content — no tab bar sub-nav. Footer disclaimer below last accordion.
+```css
+border: 1px solid var(--line);
+border-left: 3px solid var(--flag);   /* --red for .leak */
+border-radius: 8px;
+font-size: 13px;
+line-height: 1.5;
+```
 
 ---
 
@@ -652,8 +508,7 @@ Accordion-only content — no tab bar sub-nav. Footer disclaimer below last acco
 | Element | Radius |
 |---|---|
 | Cards, accordions | `16px` (`--r`) |
-| Buttons | `11px` |
-| Stepper | `11px` |
+| Buttons, stepper, text input | `11px` |
 | Tab bar items | `12px` |
 | Modal sheet | `18px` |
 | Pills, toast, chips, bars | `99px` (full) |
@@ -666,9 +521,9 @@ Accordion-only content — no tab bar sub-nav. Footer disclaimer below last acco
 
 ## Icons
 
-- **Tab bar:** 24×24 viewBox, stroke-only, no fill, `stroke-width: 1.9`, round caps/joins.
-- **Brand mark:** Breaking putt arc (`--path`), cup ring (`--ink`), pin dot (`--flag`), ball dot (`--ink`). Do not rotate, shadow, or recolor outside brand rules.
-- **Minimum mark size:** 20px; clear space ≥ ball diameter (12% of mark width).
+- **Tab bar:** 24×24 viewBox, stroke-only, no fill, `stroke-width: 1.9`, round caps/joins, rendered at `21×21`.
+- **Brand mark:** suite-specific glyph using palette rules — pin/flag dot `--flag`, ball/path `--path`, dimmed elements ivory at reduced opacity. Do not rotate, shadow, or recolor outside brand rules.
+- **Minimum mark size:** 20px.
 
 ---
 
@@ -677,11 +532,10 @@ Accordion-only content — no tab bar sub-nav. Footer disclaimer below last acco
 | Concern | Implementation |
 |---|---|
 | Safe areas | `env(safe-area-inset-*)` on body and tab bar |
-| Theme color | `#0A201A` (HTML meta) / `#0E2A22` (manifest) |
+| Theme color | `#0A201A` (HTML `theme-color` meta) / `#0E2A22` (manifest `theme_color`) |
 | Tap highlight | `-webkit-tap-highlight-color: transparent` |
 | Font smoothing | `-webkit-font-smoothing: antialiased` |
 | Overscroll | `overscroll-behavior-y: none` on `html, body` |
-| Touch | Clock dial: `touch-action: none`; pointer events for drag |
 | Motion | Respects `prefers-reduced-motion` |
 | PWA | Standalone, portrait, offline via service worker |
 
@@ -691,42 +545,48 @@ Accordion-only content — no tab bar sub-nav. Footer disclaimer below last acco
 
 | File | Design responsibility |
 |---|---|
-| `styles.css` | Tokens, components, layout (GreenIQ) |
-| `index.html` | Structure, font loading, semantic sections |
-| `app.js` | SVG chart generation, dynamic states (GreenIQ) |
-| `greeniq-logo/` | Brand palette, mark rules, PWA icons |
-| `manifest.webmanifest` | Theme/background colors, orientation |
-| `practiceiq/index.html` | PracticeIQ tokens, components, layout (inline styles) |
-| `practiceiq-logo/` | PracticeIQ mark, lockups, PWA icons |
-| `DESIGN_SYSTEM.md` | Cross-suite design spec (this file) |
+| `golfiq-design-system/golfiq.css` | **Canonical** tokens, page treatment, shared primitives |
+| `golfiq-design-system/DESIGN_SYSTEM.md` | **Canonical** cross-suite spec (this file) |
+| `golfiq-design-system/sync.mjs` | Propagates `golfiq.css` + this doc into each app |
+| `greeniq/golfiq.css` · `styles.css` | Vendored shared layer (linked) + GreenIQ-specific components |
+| `strokesiq/src/styles/golfiq.css` · `components.css` | Vendored shared layer (imported) + StrokesIQ components |
+| `practiceiq/golfiq.css` · inline `<style>` | Vendored shared layer (linked) + a small reconciliation override block + PracticeIQ components |
 
 ---
 
 ## Suite app notes
 
-### PracticeIQ
+App-specific structures are intentional product choices, not spec exceptions. All apps share the tokens, background, fonts, and primitives above.
 
-Implements the full token set and component hierarchy in a single `index.html`. Deviations from GreenIQ are intentional product choices, not spec exceptions:
+### GreenIQ (reference)
+
+Putt-read instrument: slope reader, direction clock, schematic, feel trainer. Header scrolls with content.
+
+### StrokesIQ
+
+Strokes-gained tracker: scoring-potential hero, leak diagnosis, diverging SG bars, miss heat grid, per-hole entry. 3-tab bar (Home · Rounds · More).
+
+### PracticeIQ
 
 | Area | PracticeIQ |
 |---|---|
 | Tabs | 5 items (Today · Practice · Rounds · Plan · More) |
 | Header | Sticky, transparent — gradient must show through |
-| Data font | JetBrains Mono for metrics; Space Grotesk for labels |
-| Hero metric | `.metric.hero` uses `.read` card gradient |
+| Data font | System mono (unified with the suite) |
+| Hero metric | `.metric.hero` uses the `.read` card gradient |
 | Accent rail | `.cue` banner — flag-yellow left border (swing thought) |
-| Category pills | Semantic tinted `.pill` variants (speed / putt / score) |
+| Category pills | Semantic tinted `.pill` variants (speed / putt / score), token-derived |
 | Primary CTA | `.btn.primary` on save, start, and done actions |
 
 ---
 
 ## Quick start for new GolfIQ surfaces
 
-1. Copy `:root` tokens from `styles.css` (or PracticeIQ `index.html`).
-2. Load Space Grotesk (500, 700) from Google Fonts.
-3. Apply the canonical page background (see **Background treatment**): `html` + `body` with fixed radial gradient; transparent header.
+1. Link/import the shared layer: `golfiq.css` (vendor a copy via `golfiq-design-system` sync, or `import '@golfiq/design-system/css'` in a build app).
+2. Load Space Grotesk (500, 700).
+3. The shared layer already applies tokens, the canonical page background, `.mono`, and all primitives.
 4. Stack content in `.card` sections inside a 520px column.
-5. Put primary actions in `.btn.primary`; keep yellow scarce.
+5. Put primary actions in `.primary`; keep yellow scarce. Toasts stay neutral.
 6. Render measurements in mono; labels in uppercase sage eyebrows (Space Grotesk).
 7. Anchor navigation in a blurred `.tabbar` with safe-area padding; active tab uses `--flag`.
 8. Draw data as SVG using `--path`, `--flag`, and `--sage` semantics.

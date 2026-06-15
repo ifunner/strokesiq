@@ -1,7 +1,9 @@
 import '@fontsource/space-grotesk/400.css';
 import '@fontsource/space-grotesk/500.css';
 import '@fontsource/space-grotesk/700.css';
-import './styles/tokens.css';
+// Shared GolfIQ design system (vendored from golfiq-design-system; do not edit
+// src/styles/golfiq.css by hand — edit the source package and run its sync).
+import './styles/golfiq.css';
 import './styles/components.css';
 import { initApp } from './app';
 import { initPWA } from './pwa';

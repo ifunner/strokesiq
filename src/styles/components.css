@@ -1,108 +1,6 @@
-/* Component styles ported from the StrokesIQ prototype. */
-
-/* header */
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-.brand .mark {
-  width: 26px;
-  height: 26px;
-}
-.brand h1 {
-  font-size: 21px;
-  letter-spacing: -0.028em;
-  margin: 0;
-  font-weight: 500;
-}
-.brand h1 b {
-  font-weight: 700;
-  color: var(--path);
-  margin-left: -0.05em; /* pull "IQ" in so it reads as one word (brand lockup) */
-}
-.pill {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--felt-deep);
-  background: var(--flag);
-  border-radius: 99px;
-  padding: 5px 9px;
-  border: none;
-  cursor: pointer;
-}
-.eyebrow {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--sage);
-  margin: 0;
-}
-
-/* pages */
-.page {
-  display: none;
-  animation: pgin 0.18s ease;
-}
-.page.on {
-  display: block;
-}
-@keyframes pgin {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-/* cards */
-.card {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  padding: 15px;
-  margin-bottom: 13px;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.025) inset, 0 8px 24px -18px #000;
-}
-.card.read {
-  background: linear-gradient(180deg, #0c2820, #0a221b);
-  border-color: #2c5446;
-}
-.card h2 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 12px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-.num {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--flag);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 2px 6px;
-}
-.num.red {
-  color: var(--red);
-}
-.num.path {
-  color: var(--path);
-}
+/* StrokesIQ-specific components.
+ * Tokens, page treatment, and shared primitives come from golfiq.css
+ * (the vendored GolfIQ design system). Only app-unique styles live here. */
 
 /* hero */
 .hero {
@@ -147,26 +45,6 @@ header {
   text-transform: uppercase;
   color: var(--sage);
   margin-top: 3px;
-}
-
-/* verdict / leak */
-.verdict {
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--flag);
-  border-radius: 8px;
-  padding: 11px 13px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--ink);
-}
-.verdict.leak {
-  border-left-color: var(--red);
-}
-.verdict b {
-  color: var(--ink);
-}
-.verdict .dim {
-  color: var(--ink-dim);
 }
 
 /* sg category rows */
@@ -218,12 +96,7 @@ header {
   background: var(--red);
 }
 
-/* stat grid */
-.grid2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
+/* stat tiles (uses shared .grid2) */
 .stat {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -252,73 +125,6 @@ header {
   font-size: 11.5px;
   color: var(--ink-dim);
   margin-top: 2px;
-}
-
-/* buttons */
-button {
-  font: inherit;
-  cursor: pointer;
-  border-radius: 11px;
-  border: 1px solid var(--line);
-  background: var(--panel-hi);
-  color: var(--ink);
-  padding: 9px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  transition: transform 0.04s ease, background 0.15s, border-color 0.15s;
-}
-button:active {
-  transform: scale(0.96);
-}
-button.primary {
-  background: var(--flag);
-  border-color: var(--flag);
-  color: #1a1500;
-}
-button.ghost {
-  background: transparent;
-}
-button.path {
-  background: var(--path);
-  border-color: var(--path);
-  color: #04140c;
-}
-button.danger {
-  border-color: var(--red);
-  color: var(--red);
-  background: transparent;
-}
-button.block {
-  width: 100%;
-  padding: 13px;
-  font-size: 14px;
-  font-weight: 700;
-}
-.btnrow {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 11px;
-}
-.btnrow button {
-  flex: 1;
-}
-.linkbtn {
-  background: none;
-  border: none;
-  color: var(--ink);
-  padding: 0;
-  font-weight: 600;
-  font-size: 13px;
-}
-
-.seclabel {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--sage);
-  margin: 18px 2px 10px;
 }
 
 /* last round / history row */
@@ -360,72 +166,7 @@ button.block {
   font-weight: 600;
 }
 
-/* fields */
-.field {
-  margin-top: 11px;
-}
-.field:first-child {
-  margin-top: 0;
-}
-.field label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--sage);
-  margin-bottom: 7px;
-}
-.field label .u {
-  text-transform: none;
-  letter-spacing: 0;
-  color: var(--ink-dim);
-  font-weight: 500;
-}
-.stepper {
-  display: flex;
-  border: 1px solid var(--line);
-  border-radius: 11px;
-  overflow: hidden;
-  background: var(--felt-deep);
-}
-.stepper button {
-  border: none;
-  border-radius: 0;
-  background: none;
-  color: var(--sage);
-  font-size: 19px;
-  width: 42px;
-  padding: 10px 0;
-}
-.stepper input {
-  flex: 1;
-  border: none;
-  background: none;
-  color: var(--ink);
-  text-align: center;
-  font-family: var(--mono);
-  font-size: 17px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  outline: none;
-  min-width: 0;
-}
-.txtinput {
-  width: 100%;
-  border: 1px solid var(--line);
-  background: var(--felt-deep);
-  color: var(--ink);
-  border-radius: 11px;
-  padding: 11px 12px;
-  font-size: 14px;
-  font-family: var(--ui);
-  outline: none;
-}
-.txtinput::placeholder {
-  color: var(--sage);
-}
-/* Native date input: stop WebKit's intrinsic min-width + default inner styling
+/* native date input: stop WebKit's intrinsic min-width + default inner styling
    from overflowing the rounded box on dark surfaces. */
 input[type='date'].txtinput {
   -webkit-appearance: none;
@@ -443,51 +184,11 @@ input[type='date'].txtinput::-webkit-date-and-time-value {
 input[type='date'].txtinput::-webkit-datetime-edit {
   padding: 0;
 }
-/* Recolor the calendar picker icon so it's visible (and inside) on dark felt. */
 input[type='date'].txtinput::-webkit-calendar-picker-indicator {
   filter: invert(0.85);
   opacity: 0.7;
   cursor: pointer;
   margin-left: 4px;
-}
-
-/* segmented */
-.seg {
-  display: flex;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  overflow: hidden;
-}
-.seg button {
-  flex: 1;
-  border: none;
-  border-radius: 0;
-  background: none;
-  padding: 8px 6px;
-  font-size: 12px;
-}
-.seg button.on {
-  background: var(--flag);
-  color: #1a1500;
-}
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-}
-.chip {
-  font-size: 12px;
-  font-weight: 600;
-  background: var(--felt-deep);
-  border: 1px solid var(--line);
-  border-radius: 99px;
-  padding: 6px 11px;
-  color: var(--ink);
-}
-.chip.on {
-  background: var(--flag);
-  border-color: var(--flag);
-  color: #1a1500;
 }
 
 /* dispersion pad */
@@ -620,92 +321,68 @@ input[type='date'].txtinput::-webkit-calendar-picker-indicator {
   color: var(--path);
 }
 
-footer {
-  font-size: 11px;
-  color: var(--sage);
-  text-align: center;
-  padding: 18px 0 2px;
-  line-height: 1.6;
+/* course setup rows */
+.crow {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
 }
-
-/* accordion */
-details {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  margin-bottom: 10px;
-  overflow: hidden;
+.crow:last-child {
+  border-bottom: none;
 }
-details summary {
-  list-style: none;
-  cursor: pointer;
-  padding: 14px 15px;
-  font-size: 13px;
-  font-weight: 700;
-  display: flex;
-  justify-content: space-between;
-}
-details summary::-webkit-details-marker {
-  display: none;
-}
-details summary::after {
-  content: '+';
-  color: var(--sage);
-  font-family: var(--mono);
-  font-size: 18px;
-}
-details[open] summary::after {
-  content: '–';
-}
-details .body {
-  padding: 0 15px 15px;
-  font-size: 13px;
-  line-height: 1.62;
-  color: var(--ink-dim);
-}
-details .body b {
-  color: var(--ink);
-}
-
-/* tab bar */
-.tabbar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 40;
-  background: rgba(9, 26, 21, 0.92);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-top: 1px solid var(--line);
-  padding: 6px 8px calc(8px + env(safe-area-inset-bottom));
-}
-.tabbar .inner {
-  max-width: 520px;
-  margin: 0 auto;
-  display: flex;
-}
-.tabbar button {
-  flex: 1;
-  background: none;
-  border: none;
-  display: flex;
-  flex-direction: column;
+.crow .top {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 12px;
   align-items: center;
-  gap: 3px;
-  padding: 7px 0;
+}
+.crow .hn {
   color: var(--ink-dim);
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: 13px;
+  text-align: center;
+}
+.crow .cpar {
+  display: flex;
+  gap: 6px;
+}
+.crow .cpar button {
+  flex: 1;
+  padding: 7px 0;
+  font-size: 13px;
+}
+.crow .cpar button.on {
+  background: var(--flag);
+  border-color: var(--flag);
+  color: #1a1500;
+}
+.crow .cyd {
+  margin-top: 8px;
+  padding-left: 42px;
+}
+
+/* update banner (new version available) */
+.updatebar {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  z-index: 75;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--panel-hi);
+  border: 1px solid var(--flag);
+  color: var(--ink);
   border-radius: 12px;
+  padding: 10px 12px 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 8px 24px -16px #000;
+  max-width: calc(100% - 28px);
 }
-.tabbar button.on {
-  color: var(--flag);
-}
-.tabbar svg {
-  width: 21px;
-  height: 21px;
+.updatebar button {
+  padding: 7px 12px;
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 /* misc */
@@ -772,140 +449,4 @@ details .body b {
   color: var(--ink-dim);
   font-size: 13px;
   line-height: 1.5;
-}
-
-/* course setup rows */
-.crow {
-  padding: 10px 0;
-  border-bottom: 1px solid var(--line);
-}
-.crow:last-child {
-  border-bottom: none;
-}
-.crow .top {
-  display: grid;
-  grid-template-columns: 30px 1fr;
-  gap: 12px;
-  align-items: center;
-}
-.crow .hn {
-  color: var(--ink-dim);
-  font-size: 13px;
-  text-align: center;
-}
-.crow .cpar {
-  display: flex;
-  gap: 6px;
-}
-.crow .cpar button {
-  flex: 1;
-  padding: 7px 0;
-  font-size: 13px;
-}
-.crow .cpar button.on {
-  background: var(--flag);
-  border-color: var(--flag);
-  color: #1a1500;
-}
-.crow .cyd {
-  margin-top: 8px;
-  padding-left: 42px;
-}
-
-/* update banner (new version available) */
-.updatebar {
-  position: fixed;
-  left: 50%;
-  bottom: 96px;
-  transform: translateX(-50%);
-  z-index: 75;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--panel-hi);
-  border: 1px solid var(--flag);
-  color: var(--ink);
-  border-radius: 12px;
-  padding: 10px 12px 10px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  box-shadow: 0 8px 24px -16px #000;
-  max-width: calc(100% - 28px);
-}
-.updatebar button {
-  padding: 7px 12px;
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-/* modal */
-.modal {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 18px;
-}
-.modal.on {
-  display: flex;
-}
-.modal .scrim {
-  position: absolute;
-  inset: 0;
-  background: rgba(5, 16, 12, 0.74);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-}
-.modal .sheet {
-  position: relative;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 18px;
-  max-width: 380px;
-  width: 100%;
-  box-shadow: 0 8px 24px -18px #000;
-}
-.modal .sheet h3 {
-  margin: 0 0 6px;
-  font-size: 16px;
-}
-.sheetsub {
-  font-size: 12.5px;
-  color: var(--ink-dim);
-  line-height: 1.5;
-  margin: 0 0 14px;
-}
-.stepper.big input {
-  font-size: 24px;
-  padding: 14px 0;
-}
-.stepper.big button {
-  font-size: 22px;
-  width: 52px;
-}
-
-/* toast */
-.toast {
-  position: fixed;
-  left: 50%;
-  bottom: 96px;
-  transform: translateX(-50%) translateY(20px);
-  z-index: 70;
-  background: var(--panel-hi);
-  border: 1px solid var(--line);
-  color: var(--ink);
-  border-radius: 99px;
-  padding: 10px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  opacity: 0;
-  transition: 0.25s;
-  pointer-events: none;
-}
-.toast.on {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
 }

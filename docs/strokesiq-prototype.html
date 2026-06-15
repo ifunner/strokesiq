@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0A201A" />
+<title>StrokesIQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --felt:#0E2A22; --felt-deep:#0A201A; --panel:#10322A; --panel-hi:#143a30;
+  --ink:#F2EBDA; --ink-dim:#9DB3A6; --sage:#6E8F7E; --line:#26483D;
+  --flag:#F4D03F; --path:#46C98A; --red:#E06A5C; --uphill:#7FC8FF; --r:16px;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --ui:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{
+  font-family:var(--ui); color:var(--ink); -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:none;
+  background:radial-gradient(120% 60% at 50% -10%, #16382d 0%, var(--felt) 42%, var(--felt-deep) 100%);
+  background-attachment:fixed; min-height:100vh;
+}
+.app{max-width:520px;margin:0 auto;
+  padding:max(14px,env(safe-area-inset-top)) 14px calc(96px + env(safe-area-inset-bottom));}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* header */
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:9px}
+.brand .mark{width:26px;height:26px}
+.brand h1{font-size:21px;letter-spacing:-0.028em;margin:0;font-weight:500}
+.brand h1 b{font-weight:700;color:var(--path)}
+.pill{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--felt-deep);background:var(--flag);border-radius:99px;padding:5px 9px}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--sage);margin:0}
+
+/* pages */
+.page{display:none;animation:pgin .18s ease}
+.page.on{display:block}
+@keyframes pgin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* cards */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  padding:15px;margin-bottom:13px;box-shadow:0 1px 0 rgba(255,255,255,.025) inset,0 8px 24px -18px #000}
+.card.read{background:linear-gradient(180deg,#0c2820,#0a221b);border-color:#2c5446}
+.card h2{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:13px;font-weight:700;letter-spacing:.04em}
+.num{font-family:var(--mono);font-size:12px;color:var(--flag);border:1px solid var(--line);border-radius:6px;padding:2px 6px}
+.num.red{color:var(--red)} .num.path{color:var(--path)}
+
+/* hero */
+.hero{text-align:center;padding:6px 0 2px}
+.hero .pot{font-family:var(--mono);font-size:64px;font-weight:600;letter-spacing:-.02em;color:var(--flag);line-height:1}
+.hero .sub{font-size:13px;color:var(--ink-dim);margin-top:8px}
+.hero .sub b{color:var(--ink)}
+.deltaline{display:flex;justify-content:center;gap:18px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.deltaline div{text-align:center}
+.deltaline .v{font-family:var(--mono);font-size:18px;font-weight:600}
+.deltaline .l{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--sage);margin-top:3px}
+
+/* verdict / leak */
+.verdict{border:1px solid var(--line);border-left:3px solid var(--flag);border-radius:8px;
+  padding:11px 13px;font-size:13px;line-height:1.5;color:var(--ink)}
+.verdict.leak{border-left-color:var(--red)}
+.verdict b{color:var(--ink)}
+.verdict .dim{color:var(--ink-dim)}
+
+/* sg category rows */
+.sgrow{display:grid;grid-template-columns:78px 1fr 52px;align-items:center;gap:10px;padding:7px 0}
+.sgrow .lab{font-size:13px;color:var(--ink)}
+.sgrow .val{font-family:var(--mono);font-size:14px;text-align:right;font-weight:600}
+.sgbar{position:relative;height:8px;background:var(--felt-deep);border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.sgbar .z{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line)}
+.sgbar i{position:absolute;top:0;bottom:0;display:block}
+.pos{color:var(--path)} .neg{color:var(--red)}
+.sgbar i.pos{left:50%;background:var(--path)} .sgbar i.neg{right:50%;background:var(--red)}
+
+/* stat grid */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px}
+.stat .l{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--sage)}
+.stat .v{font-family:var(--mono);font-size:30px;font-weight:600;margin-top:6px;letter-spacing:-.02em}
+.stat .v .u{font-size:14px;color:var(--ink-dim)}
+.stat .d{font-size:11.5px;color:var(--ink-dim);margin-top:2px}
+
+/* buttons */
+button{font:inherit;cursor:pointer;border-radius:11px;border:1px solid var(--line);
+  background:var(--panel-hi);color:var(--ink);padding:9px 12px;font-size:13px;font-weight:600;
+  transition:transform .04s ease,background .15s,border-color .15s}
+button:active{transform:scale(.96)}
+button.primary{background:var(--flag);border-color:var(--flag);color:#1a1500}
+button.ghost{background:transparent}
+button.path{background:var(--path);border-color:var(--path);color:#04140c}
+button.block{width:100%;padding:13px;font-size:14px;font-weight:700}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.btnrow button{flex:1}
+.linkbtn{background:none;border:none;color:var(--ink);padding:0;font-weight:600;font-size:13px}
+
+/* eyebrow section labels */
+.seclabel{font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--sage);margin:18px 2px 10px}
+
+/* last round / history row */
+.rrow{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px;margin-bottom:10px}
+.rrow .meta .c{font-size:14px;font-weight:600}
+.rrow .meta .d{font-size:11.5px;color:var(--ink-dim);margin-top:2px}
+.rrow .right{text-align:right}
+.rrow .right .s{font-family:var(--mono);font-size:22px;font-weight:600}
+.rrow .right .leak{font-size:10.5px;color:var(--red);letter-spacing:.04em;margin-top:2px;text-transform:uppercase;font-weight:600}
+
+/* fields */
+.field{margin-top:11px}
+.field:first-child{margin-top:0}
+.field label{display:block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--sage);margin-bottom:7px}
+.field label .u{text-transform:none;letter-spacing:0;color:var(--ink-dim);font-weight:500}
+.stepper{display:flex;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--felt-deep)}
+.stepper button{border:none;border-radius:0;background:none;color:var(--sage);font-size:19px;width:42px;padding:10px 0}
+.stepper input{flex:1;border:none;background:none;color:var(--ink);text-align:center;font-family:var(--mono);
+  font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;outline:none;min-width:0}
+.txtinput{width:100%;border:1px solid var(--line);background:var(--felt-deep);color:var(--ink);
+  border-radius:11px;padding:11px 12px;font-size:14px;font-family:var(--ui);outline:none}
+.txtinput::placeholder{color:var(--sage)}
+
+/* segmented */
+.seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.seg button{flex:1;border:none;border-radius:0;background:none;padding:8px 6px;font-size:12px}
+.seg button.on{background:var(--flag);color:#1a1500}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{font-size:12px;font-weight:600;background:var(--felt-deep);border:1px solid var(--line);
+  border-radius:99px;padding:6px 11px;color:var(--ink)}
+.chip.on{background:var(--flag);border-color:var(--flag);color:#1a1500}
+
+/* dispersion pad */
+.padwrap{display:flex;gap:14px;align-items:center}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:5px;
+  width:150px;height:150px;flex:none}
+.pad button{border:1px solid var(--line);border-radius:8px;background:var(--felt-deep);
+  display:flex;align-items:center;justify-content:center;padding:0;font-size:9px;color:var(--sage);letter-spacing:.04em}
+.pad button.center{background:#0c2820;border-color:#2c5446}
+.pad button .dot{width:9px;height:9px;border-radius:99px;background:var(--path)}
+.pad button.on{border-color:var(--flag);background:rgba(244,208,63,.14);color:var(--flag);box-shadow:0 0 0 1px var(--flag) inset}
+.pad button.on .dot{background:var(--flag)}
+.padhelp{font-size:12px;color:var(--ink-dim);line-height:1.5}
+.padhelp b{color:var(--ink)}
+.padhelp .tag{display:inline-block;margin-top:6px;font-family:var(--mono);font-size:12px;color:var(--flag)}
+
+/* hole progress */
+.holehead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.holehead .h{font-size:18px;font-weight:700}
+.progress{display:flex;gap:3px;margin-bottom:14px}
+.progress span{flex:1;height:4px;border-radius:99px;background:var(--line)}
+.progress span.done{background:var(--path)}
+.progress span.cur{background:var(--flag)}
+.parpick{display:flex;gap:7px}
+.parpick button{flex:1}
+.parpick button.on{background:var(--flag);border-color:var(--flag);color:#1a1500}
+
+/* mini sg in review */
+.summ{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px 8px}
+.summ .it .l{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sage)}
+.summ .it .v{font-family:var(--mono);font-size:22px;font-weight:600;margin-top:3px}
+
+/* miss heat */
+.heat{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;width:150px;height:150px;margin:0 auto}
+.heat div{border:1px solid var(--line);border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:12px;color:var(--ink-dim)}
+.heat div.c{background:#0c2820;border-color:#2c5446;color:var(--path)}
+
+footer{font-size:11px;color:var(--sage);text-align:center;padding:18px 0 2px;line-height:1.6}
+
+/* accordion */
+details{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+details summary{list-style:none;cursor:pointer;padding:14px 15px;font-size:13px;font-weight:700;display:flex;justify-content:space-between}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"+";color:var(--sage);font-family:var(--mono);font-size:18px}
+details[open] summary::after{content:"–"}
+details .body{padding:0 15px 15px;font-size:13px;line-height:1.62;color:var(--ink-dim)}
+details .body b{color:var(--ink)}
+
+/* tab bar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(9,26,21,.92);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
+  padding:6px 8px calc(8px + env(safe-area-inset-bottom))}
+.tabbar .inner{max-width:520px;margin:0 auto;display:flex}
+.tabbar button{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:7px 0;color:var(--ink-dim);font-size:10.5px;font-weight:700;letter-spacing:.04em;border-radius:12px}
+.tabbar button.on{color:var(--flag)}
+.tabbar svg{width:21px;height:21px}
+
+.spacer{height:4px}
+
+/* additions */
+.pillbtn{border:none;cursor:pointer}
+.parlbl{color:var(--ink-dim);font-weight:500;font-size:14px}
+.cardhint{font-size:12px;color:var(--ink-dim);margin:-4px 0 12px}
+.holestrip{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;margin-bottom:4px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.holestrip::-webkit-scrollbar{display:none}
+.holestrip button{flex:none;width:34px;height:34px;padding:0;border-radius:9px;font-family:var(--mono);
+  font-size:13px;font-weight:600;background:var(--felt-deep);border:1px solid var(--line);color:var(--ink-dim);position:relative}
+.holestrip button.done{color:var(--ink);border-color:#2c5446}
+.holestrip button.done::after{content:"";position:absolute;bottom:4px;left:50%;transform:translateX(-50%);
+  width:4px;height:4px;border-radius:99px;background:var(--path)}
+.holestrip button.cur{background:var(--flag);border-color:var(--flag);color:#1a1500}
+.holestrip button.cur::after{display:none}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:18px}
+.modal.on{display:flex}
+.modal .scrim{position:absolute;inset:0;background:rgba(5,16,12,.74);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.modal .sheet{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;
+  padding:18px;max-width:380px;width:100%;box-shadow:0 8px 24px -18px #000}
+.modal .sheet h3{margin:0 0 6px;font-size:16px}
+.sheetsub{font-size:12.5px;color:var(--ink-dim);line-height:1.5;margin:0 0 14px}
+.stepper.big input{font-size:24px;padding:14px 0}
+.stepper.big button{font-size:22px;width:52px}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);z-index:70;
+  background:var(--panel-hi);border:1px solid var(--line);color:var(--ink);border-radius:99px;
+  padding:10px 16px;font-size:13px;font-weight:600;opacity:0;transition:.25s;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion:reduce){.page{animation:none}*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 32 32" fill="none">
+        <path d="M7 25c4-12 9-15 14-17" stroke="#46C98A" stroke-width="2.2" stroke-linecap="round"/>
+        <circle cx="22" cy="7" r="3.4" stroke="#F2EBDA" stroke-width="2" fill="none"/>
+        <circle cx="22" cy="7" r="1.2" fill="#F4D03F"/>
+        <circle cx="7" cy="25" r="2" fill="#F2EBDA"/>
+      </svg>
+      <h1>Strokes<b>IQ</b></h1>
+    </div>
+    <button class="pill pillbtn" id="hcap" onclick="openHcap()">HCP 14</button>
+  </header>
+
+  <!-- ============ HOME ============ -->
+  <section class="page on" id="home">
+    <div class="card read">
+      <p class="eyebrow" style="text-align:center">Scoring potential</p>
+      <div class="hero">
+        <div class="pot">88</div>
+        <div class="sub">You're a <b>92</b> leaving <b>4 strokes</b> on the course.<br>Fix your biggest leak and 88 is in reach.</div>
+        <div class="deltaline">
+          <div><div class="v mono">92.1</div><div class="l">Avg score</div></div>
+          <div><div class="v mono neg">−8.4</div><div class="l">SG / round</div></div>
+          <div><div class="v mono">5</div><div class="l">Rounds</div></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="primary block" onclick="go('newround')" style="margin-bottom:13px">New round</button>
+
+    <div class="card">
+      <h2><span class="num red">!</span> Biggest leak</h2>
+      <div class="verdict leak" id="homeleak"></div>
+    </div>
+
+    <div class="card">
+      <h2>Strokes gained · last 5 rounds</h2>
+      <div id="homesg"></div>
+      <p style="font-size:11.5px;color:var(--ink-dim);margin:10px 0 0">Measured against scratch. Your worst category is where the strokes are hiding.</p>
+    </div>
+
+    <div class="grid2" style="margin-bottom:13px">
+      <div class="stat"><div class="l">Avg putts</div><div class="v mono">33.4</div><div class="d">2.1 three-putts/rd</div></div>
+      <div class="stat"><div class="l">GIR</div><div class="v mono">28<span class="u">%</span></div><div class="d">5 greens/round</div></div>
+      <div class="stat"><div class="l">Fairways</div><div class="v mono">46<span class="u">%</span></div><div class="d">6.4 of 14</div></div>
+      <div class="stat"><div class="l">Penalties</div><div class="v mono">1.6</div><div class="d">mostly off the tee</div></div>
+    </div>
+
+    <p class="seclabel">Last round</p>
+    <button class="rrow" onclick="openReview(0)">
+      <div class="meta"><div class="c">Glen Abbey</div><div class="d">Jun 11 · 73 tees</div></div>
+      <div class="right"><div class="s mono">90</div><div class="leak">approach</div></div>
+    </button>
+  </section>
+
+  <!-- ============ NEW ROUND ============ -->
+  <section class="page" id="newround">
+    <h2 class="card" style="border:none;background:none;box-shadow:none;padding:0;margin:0 2px 4px;font-size:18px">New round</h2>
+    <p style="color:var(--ink-dim);font-size:13px;margin:0 2px 16px">Saved courses remember their pars — pick one to skip ahead.</p>
+
+    <div class="card">
+      <div class="field">
+        <label>Course</label>
+        <input class="txtinput" id="coursename" placeholder="Search or type a course" value="Glen Abbey" />
+        <div class="chips" style="margin-top:10px">
+          <button class="chip on">Glen Abbey</button>
+          <button class="chip">Angus Glen</button>
+          <button class="chip">Eagles Nest</button>
+          <button class="chip">+ Save</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Tee box</label>
+        <div class="seg" id="teeseg">
+          <button>Black</button><button class="on">Blue · 73</button><button>White</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Date</label>
+        <input class="txtinput" type="text" value="Jun 14, 2026" />
+      </div>
+    </div>
+
+    <button class="primary block" onclick="startRound()">Start round →</button>
+    <div class="spacer"></div>
+    <button class="ghost block" onclick="go('home')">Cancel</button>
+  </section>
+
+  <!-- ============ HOLE ENTRY ============ -->
+  <section class="page" id="hole">
+    <div class="holehead">
+      <div class="h">Hole <span id="holeno" class="mono">1</span><span class="parlbl" id="parlbl"> · par 4</span></div>
+      <button class="ghost" onclick="finishEarly()" style="padding:5px 10px;font-size:12px">Finish</button>
+    </div>
+    <div class="holestrip" id="holestrip"></div>
+
+    <div class="card">
+      <div class="field">
+        <label>Par</label>
+        <div class="parpick" id="parpick">
+          <button data-par="3">3</button><button data-par="4" class="on">4</button><button data-par="5">5</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Score</label>
+        <div class="stepper"><button onclick="step('score',-1)">−</button><input id="score" class="mono" value="4" readonly /><button onclick="step('score',1)">+</button></div>
+      </div>
+    </div>
+
+    <div class="card" id="teecard">
+      <h2><span class="num">1</span> Tee shot</h2>
+      <div class="field">
+        <label>Result</label>
+        <div class="seg" id="teeres">
+          <button class="on">Fairway</button><button>Left</button><button>Right</button><button>Penalty</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Driving distance <span class="u">(yds)</span></label>
+        <div class="stepper"><button onclick="step('drive',-5)">−</button><input id="drive" class="mono" value="245" readonly /><button onclick="step('drive',5)">+</button></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">2</span> Approach</h2>
+      <div class="field">
+        <label>Distance to pin <span class="u">(yds)</span></label>
+        <div class="stepper"><button onclick="step('appr',-5)">−</button><input id="appr" class="mono" value="155" readonly /><button onclick="step('appr',5)">+</button></div>
+      </div>
+      <div class="field">
+        <label>Where it finished</label>
+        <div class="padwrap">
+          <div class="pad" id="pad">
+            <button data-m="LL">L·L</button><button data-m="L">long</button><button data-m="LR">L·R</button>
+            <button data-m="left">left</button><button data-m="green" class="center on"><span class="dot"></span></button><button data-m="right">right</button>
+            <button data-m="SL">S·L</button><button data-m="S">short</button><button data-m="SR">S·R</button>
+          </div>
+          <div class="padhelp">
+            Tap where the ball ended up. Center is a <b>green hit</b>.<br>
+            One tap sets GIR <i>and</i> your miss direction.
+            <div class="tag" id="padtag">On the green · GIR</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">3</span> Putting</h2>
+      <div class="field">
+        <label>First putt distance <span class="u">(ft)</span></label>
+        <div class="stepper"><button onclick="step('fp',-1)">−</button><input id="fp" class="mono" value="22" readonly /><button onclick="step('fp',1)">+</button></div>
+      </div>
+      <div class="field">
+        <label>Total putts</label>
+        <div class="stepper"><button onclick="step('putts',-1)">−</button><input id="putts" class="mono" value="2" readonly /><button onclick="step('putts',1)">+</button></div>
+      </div>
+    </div>
+
+    <div class="card" id="shortcard" style="display:none">
+      <h2><span class="num">4</span> Short game</h2>
+      <p class="cardhint">You missed the green — log the up &amp; down.</p>
+      <div class="field">
+        <label>Lie</label>
+        <div class="seg" id="lie"><button class="on">Rough</button><button>Fairway</button><button>Sand</button></div>
+      </div>
+      <div class="field">
+        <label>Up &amp; down</label>
+        <div class="seg" id="updown"><button>Made</button><button class="on">Missed</button></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="field" style="margin:0">
+        <label>Penalty strokes</label>
+        <div class="seg" id="pen"><button class="on">0</button><button>1</button><button>2+</button></div>
+      </div>
+    </div>
+
+    <div class="btnrow">
+      <button class="ghost" onclick="prevHole()">← Prev</button>
+      <button class="primary" id="nextbtn" onclick="nextHole()">Next hole →</button>
+    </div>
+    <div class="spacer"></div><div class="spacer"></div>
+  </section>
+
+  <!-- ============ REVIEW ============ -->
+  <section class="page" id="review">
+    <div class="holehead">
+      <div><div class="eyebrow" id="rev-course">Glen Abbey</div><div class="h" style="margin-top:2px">Round review</div></div>
+      <button class="ghost" onclick="go('home')" style="padding:5px 10px;font-size:12px">Done</button>
+    </div>
+
+    <div class="card read">
+      <div class="summ">
+        <div class="it"><div class="l">Score</div><div class="v mono" id="rev-score">90</div></div>
+        <div class="it"><div class="l">vs par</div><div class="v mono" id="rev-vspar">+18</div></div>
+        <div class="it"><div class="l">Putts</div><div class="v mono" id="rev-putts">33</div></div>
+        <div class="it"><div class="l">GIR</div><div class="v mono" id="rev-gir">28%</div></div>
+        <div class="it"><div class="l">Fairways</div><div class="v mono" id="rev-fir">43%</div></div>
+        <div class="it"><div class="l">Penalties</div><div class="v mono" id="rev-pen">2</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Strokes gained · this round</h2>
+      <div id="revsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>Miss pattern</h2>
+      <div class="heat" id="revheat"></div>
+      <p style="font-size:12.5px;color:var(--ink-dim);text-align:center;margin:12px 0 0" id="revheattext">
+        9 of 13 missed greens finished <b style="color:var(--ink)">short</b>. You're leaving approach shots in the front bunker and short rough.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num red">→</span> Practice this next</h2>
+      <div class="verdict leak" id="revrec">
+        <b>Approach cost you the most — 3.4 strokes.</b>
+        <span class="dim">Most damage came from 120–170 yds, missing short. Spend your next 3 sessions on stock-yardage approach play, clubbing up one extra.</span>
+      </div>
+    </div>
+    <div class="spacer"></div>
+  </section>
+
+  <!-- ============ ROUNDS ============ -->
+  <section class="page" id="rounds">
+    <h2 style="font-size:18px;margin:0 2px 4px">Rounds</h2>
+    <p style="color:var(--ink-dim);font-size:13px;margin:0 2px 16px">Every scored round lives here. Tap one to reopen its review.</p>
+    <div id="historylist"></div>
+    <button class="primary block" onclick="go('newround')">New round</button>
+    <div class="spacer"></div>
+  </section>
+
+  <!-- ============ MORE ============ -->
+  <section class="page" id="more">
+    <h2 style="font-size:18px;margin:0 2px 16px">More</h2>
+    <details open>
+      <summary>How StrokesIQ works</summary>
+      <div class="body">Every shot is scored against <b>strokes gained</b> — the standard the tour uses. We compare where your shot started and finished to what a scratch golfer would average from those spots. The gap, in strokes, tells you exactly where your round leaked. <b>Approach, putting, and driving</b> each get their own number so you can stop guessing what to practice.</div>
+    </details>
+    <details>
+      <summary>Why approach distances matter</summary>
+      <div class="body">Distances are what turn stats into strokes gained. A green hit from 80 yds and a green hit from 190 yds are not the same shot — entering the distance lets us value them honestly. It's the difference between "you missed a green" and "you lost 0.6 strokes from 150."</div>
+    </details>
+    <details>
+      <summary>Your baseline</summary>
+      <div class="body">Your handicap sets the bar. We start at <b>14</b> and refine it as you log rounds, so your scoring potential and leak ranking stay tuned to your real game.</div>
+    </details>
+    <details>
+      <summary>GolfIQ suite</summary>
+      <div class="body"><b>GreenIQ</b> reads your putts on the green. <b>PracticeIQ</b> turns your biggest leak into a practice plan. StrokesIQ tells both of them where to aim.</div>
+    </details>
+    <footer>StrokesIQ · GolfIQ suite<br>Strokes gained estimated from your entered data. Not a substitute for a coach.</footer>
+  </section>
+</div>
+
+<!-- handicap modal -->
+<div class="modal" id="hcapModal">
+  <div class="scrim" onclick="closeHcap()"></div>
+  <div class="sheet">
+    <h3>Starting handicap</h3>
+    <p class="sheetsub">Sets the baseline for your strokes gained and scoring potential. It auto-refines as you log rounds.</p>
+    <div class="stepper big"><button onclick="stepHcap(-1)">−</button><input id="hcapInput" class="mono" value="14" readonly /><button onclick="stepHcap(1)">+</button></div>
+    <div class="btnrow">
+      <button class="ghost" onclick="closeHcap()">Cancel</button>
+      <button class="primary" onclick="applyHcap()">Save</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- tab bar -->
+<nav class="tabbar">
+  <div class="inner">
+    <button class="on" id="tab-home" onclick="go('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      Home</button>
+    <button id="tab-rounds" onclick="go('rounds')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18"/><path d="M6 4h11l-2 4 2 4H6"/></svg>
+      Rounds</button>
+    <button id="tab-more" onclick="go('more')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>
+      More</button>
+  </div>
+</nav>
+
+<script>
+/* ---------- expected strokes engine (scratch baseline, simplified Broadie) ---------- */
+function interp(tbl, x){
+  if(x<=tbl[0][0]) return tbl[0][1];
+  if(x>=tbl[tbl.length-1][0]) return tbl[tbl.length-1][1];
+  for(let i=0;i<tbl.length-1;i++){
+    const [x0,y0]=tbl[i], [x1,y1]=tbl[i+1];
+    if(x>=x0&&x<=x1) return y0+(y1-y0)*(x-x0)/(x1-x0);
+  }
+  return tbl[tbl.length-1][1];
+}
+const E_TEE=[[100,2.85],[150,2.91],[200,3.00],[250,3.12],[300,3.26],[350,3.45],[400,3.65],[450,3.85],[500,4.05],[550,4.28]];
+const E_FW =[[20,2.40],[40,2.60],[60,2.70],[80,2.75],[100,2.80],[120,2.85],[140,2.91],[160,2.98],[180,3.05],[200,3.12],[220,3.20],[240,3.30]];
+const E_RGH=[[20,2.59],[40,2.78],[60,2.91],[80,2.97],[100,3.02],[120,3.06],[140,3.10],[160,3.17],[180,3.25],[200,3.33],[220,3.42],[240,3.52]];
+const E_PUTT=[[1,1.00],[2,1.01],[3,1.04],[4,1.13],[5,1.23],[6,1.34],[7,1.42],[8,1.50],[9,1.56],[10,1.61],[12,1.68],[15,1.78],[20,1.87],[25,1.94],[30,2.00],[35,2.05],[40,2.10],[50,2.20],[60,2.27]];
+const eTee=d=>interp(E_TEE,d), eFw=d=>interp(E_FW,d), eRgh=d=>interp(E_RGH,d), ePutt=f=>interp(E_PUTT,f);
+
+/* compute per-category SG for a single hole of Level-2 data */
+function holeSG(h){
+  let sgDrive=0, sgAppr=0, sgPutt=0;
+  const inFw = h.teeRes==='Fairway';
+  // tee
+  if(h.par>=4){
+    const start = h.par===5 ? (h.drive+ (h.appr) + 150) : (h.drive + h.appr); // approx hole length
+    const endLie = inFw ? eFw(h.appr) : eRgh(h.appr);
+    sgDrive = eTee(Math.min(start,540)) - (1 + endLie);
+    if(h.teeRes==='Penalty') sgDrive -= 1;
+  }
+  // approach
+  const apStart = inFw ? eFw(h.appr) : eRgh(h.appr);
+  const apEnd = h.gir ? ePutt(h.fp) : 2.55; // missed green ~ around-green expected
+  sgAppr = apStart - (1 + apEnd);
+  // putting (only first putt valued cleanly; extra putts beyond expected fold in)
+  sgPutt = ePutt(h.fp) - h.putts;
+  return {sgDrive, sgAppr, sgPutt};
+}
+
+/* ---------- sample rounds (pre-seeded, realistic) ---------- */
+const ROUNDS=[
+  {course:'Glen Abbey', date:'Jun 11', tees:'Blue · 73', score:90, par:72, putts:33, gir:28, fir:43, pen:2,
+   sg:{Driving:-2.1, Approach:-3.4, Short:-1.3, Putting:-1.6}, leak:'Approach'},
+  {course:'Angus Glen', date:'Jun 4', tees:'Blue · 72', score:94, par:72, putts:35, fir:38, gir:22, pen:3,
+   sg:{Driving:-3.0, Approach:-4.2, Short:-1.1, Putting:-2.3}, leak:'Approach'},
+  {course:'Eagles Nest', date:'May 28', tees:'White · 71', score:89, par:71, putts:31, fir:50, gir:33, pen:1,
+   sg:{Driving:-1.6, Approach:-3.5, Short:-1.0, Putting:-0.7}, leak:'Approach'},
+  {course:'Glen Abbey', date:'May 21', tees:'Blue · 73', score:93, par:72, putts:34, fir:43, gir:22, pen:2,
+   sg:{Driving:-2.4, Approach:-4.0, Short:-1.8, Putting:-1.9}, leak:'Approach'},
+  {course:'Wooden Sticks', date:'May 14', tees:'Blue · 72', score:95, par:72, putts:34, fir:36, gir:17, pen:2,
+   sg:{Driving:-3.3, Approach:-4.3, Short:-1.4, Putting:-1.8}, leak:'Approach'},
+];
+
+/* ---------- diverging SG bar renderer ---------- */
+function sgRows(sg){
+  const order=['Driving','Approach','Short','Putting'];
+  const labels={Driving:'Driving',Approach:'Approach',Short:'Short game',Putting:'Putting'};
+  return order.map(k=>{
+    const v=sg[k]; const mag=Math.min(Math.abs(v)/5,1)*50;
+    const cls=v>=0?'pos':'neg';
+    const bar=v>=0
+      ? `<i class="pos" style="width:${mag}%"></i>`
+      : `<i class="neg" style="width:${mag}%"></i>`;
+    return `<div class="sgrow">
+      <div class="lab">${labels[k]}</div>
+      <div class="sgbar"><span class="z"></span>${bar}</div>
+      <div class="val ${cls}">${v>=0?'+':''}${v.toFixed(1)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- dynamic leak + recommendation copy ---------- */
+const CATLABEL={Driving:'Driving',Approach:'Approach',Short:'Short game',Putting:'Putting'};
+function worstCat(sg){return Object.entries(sg).sort((a,b)=>a[1]-b[1])[0];}
+function leakCopy(cat,mag){
+  const m=mag.toFixed(1);
+  const map={
+    Approach:[`Approach is your biggest leak — about ${m} strokes a round.`,`64% of your missed greens come up short, mostly from 120–170 yds. You're missing short, not sideways.`],
+    Driving:[`Driving is your biggest leak — about ${m} strokes a round.`,`Tee-shot penalties and missed fairways leave you out of position before you ever hit an approach.`],
+    Short:[`Your short game is the biggest leak — about ${m} strokes a round.`,`You're converting only 22% of up-and-downs when you miss the green. The chip-and-one-putt is where rounds slip.`],
+    Putting:[`Putting is your biggest leak — about ${m} strokes a round.`,`2.1 three-putts a round and a low make rate from 6–12 ft. First-putt speed control is the fix.`]
+  };
+  const [t,d]=map[cat]||map.Approach;
+  return `<b>${t}</b> <span class="dim">${d}</span>`;
+}
+function reviewRec(cat,mag){
+  const m=mag.toFixed(1);
+  const map={
+    Approach:[`Approach cost you the most — ${m} strokes.`,`Mostly from 120–170 yds, missing short. Next 3 sessions: stock-yardage approach play, club up one extra.`],
+    Driving:[`Driving cost you the most — ${m} strokes.`,`Penalties and wayward tee shots set you back. Build a reliable stock tee shot you can find.`],
+    Short:[`Short game cost you the most — ${m} strokes.`,`Up-and-downs didn't convert. Work 10–30 yd pitches and greenside lies.`],
+    Putting:[`Putting cost you the most — ${m} strokes.`,`Three-putts and mid-range misses. Drill lag speed from 25–40 ft and the 6–10 ft range.`]
+  };
+  const [t,d]=map[cat]||map.Approach;
+  return `<b>${t}</b> <span class="dim">${d}</span>`;
+}
+
+/* ---------- home aggregate ---------- */
+function renderHome(){
+  const agg={Driving:0,Approach:0,Short:0,Putting:0};
+  ROUNDS.forEach(r=>{for(const k in agg)agg[k]+=r.sg[k];});
+  for(const k in agg)agg[k]/=ROUNDS.length;
+  document.getElementById('homesg').innerHTML=sgRows(agg);
+  const w=worstCat(agg);
+  document.getElementById('homeleak').innerHTML=leakCopy(w[0],Math.abs(w[1]));
+}
+
+/* ---------- history ---------- */
+function renderHistory(){
+  document.getElementById('historylist').innerHTML=ROUNDS.map((r,i)=>`
+    <button class="rrow" onclick="openReview(${i})">
+      <div class="meta"><div class="c">${r.course}</div><div class="d">${r.date} · ${r.tees}</div></div>
+      <div class="right"><div class="s mono">${r.score}</div><div class="leak">${r.leak}</div></div>
+    </button>`).join('');
+}
+
+/* ---------- review of a stored round ---------- */
+function openReview(i){
+  const r=ROUNDS[i];
+  document.getElementById('rev-course').textContent=r.course;
+  document.getElementById('rev-score').textContent=r.score;
+  document.getElementById('rev-vspar').textContent='+'+(r.score-r.par);
+  document.getElementById('rev-putts').textContent=r.putts;
+  document.getElementById('rev-gir').textContent=r.gir+'%';
+  document.getElementById('rev-fir').textContent=r.fir+'%';
+  document.getElementById('rev-pen').textContent=r.pen;
+  const sgMap={Driving:r.sg.Driving,Approach:r.sg.Approach,Short:r.sg.Short,Putting:r.sg.Putting};
+  document.getElementById('revsg').innerHTML=sgRows(sgMap);
+  // miss heat (seeded short-bias)
+  const heat=[0,1,0, 1,9,2, 6,9,4]; // LL L LR / left green right / SL S SR style counts
+  const max=Math.max(...heat);
+  document.getElementById('revheat').innerHTML=heat.map((c,idx)=>{
+    if(idx===4) return `<div class="c">●</div>`;
+    const op=c===0?0.12:0.2+0.8*(c/max);
+    return `<div style="background:rgba(224,106,92,${op.toFixed(2)})">${c||''}</div>`;
+  }).join('');
+  // recommendation
+  const worst=worstCat(r.sg);
+  document.getElementById('revrec').innerHTML=reviewRec(worst[0],Math.abs(worst[1]));
+  go('review');
+}
+
+/* ---------- live entry state ---------- */
+const S={i:1, total:18, holes:{}, cur:{score:4,par:4,drive:245,appr:155,fp:22,putts:2,teeRes:'Fairway',miss:'green',gir:true,pen:0,lie:'Rough',upDown:'Missed'}};
+function buildStrip(){
+  let h='';
+  for(let n=1;n<=S.total;n++){
+    const done=!!S.holes[n];
+    const cls=n===S.i?'cur':(done?'done':'');
+    h+=`<button class="${cls}" onclick="jumpHole(${n})">${n}</button>`;
+  }
+  const el=document.getElementById('holestrip');
+  el.innerHTML=h;
+  const cur=el.querySelector('.cur'); if(cur)cur.scrollIntoView({inline:'center',block:'nearest'});
+}
+function jumpHole(n){ if(n===S.i)return; S.holes[S.i]={...S.cur}; S.i=n; loadHole(); window.scrollTo(0,0); }
+function startRound(){
+  S.i=1; S.holes={};
+  loadHole(); go('hole');
+}
+function loadHole(){
+  if(S.holes[S.i]) S.cur={...S.holes[S.i]};
+  document.getElementById('holeno').textContent=S.i;
+  document.getElementById('parlbl').textContent=' · par '+S.cur.par;
+  buildStrip();
+  document.getElementById('nextbtn').textContent = S.i===S.total ? 'Finish round →' : 'Next hole →';
+  setVal('score',S.cur.score);setVal('drive',S.cur.drive);setVal('appr',S.cur.appr);setVal('fp',S.cur.fp);setVal('putts',S.cur.putts);
+  document.querySelectorAll('#parpick button').forEach(x=>x.classList.toggle('on',+x.dataset.par===S.cur.par));
+  document.querySelectorAll('#pad button').forEach(x=>x.classList.toggle('on',x.dataset.m===S.cur.miss));
+  document.getElementById('teecard').style.display = S.cur.par===3?'none':'block';
+  updPadTag();
+}
+function setVal(id,v){document.getElementById(id).value=v;}
+function step(id,d){
+  const min={score:1,drive:60,appr:5,fp:1,putts:1}[id]||0;
+  S.cur[id]=Math.max(min,(S.cur[id]||0)+d);
+  setVal(id,S.cur[id]); updPadTag();
+}
+function updPadTag(){
+  const m=S.cur.miss, tag=document.getElementById('padtag');
+  const names={green:'On the green · GIR',S:'Short of the green',L:'Long',left:'Left',right:'Right',SL:'Short left',SR:'Short right',LL:'Long left',LR:'Long right'};
+  S.cur.gir = m==='green';
+  tag.textContent=names[m]||'';
+  tag.style.color = S.cur.gir?'var(--path)':'var(--red)';
+  document.getElementById('shortcard').style.display = S.cur.gir?'none':'block';
+}
+function nextHole(){
+  S.holes[S.i]={...S.cur};
+  if(S.i>=S.total){ finishRound(); return; }
+  S.i++; loadHole(); window.scrollTo(0,0);
+}
+function prevHole(){ if(S.i>1){S.i--; loadHole(); window.scrollTo(0,0);} }
+function finishEarly(){ finishRound(); }
+function finishRound(){
+  // aggregate whatever was entered; fall back to a representative seeded round for the demo
+  openReview(0);
+}
+
+/* pad + seg wiring */
+document.getElementById('pad').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  [...document.querySelectorAll('#pad button')].forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); S.cur.miss=b.dataset.m; updPadTag();
+});
+function segWire(id,key,vals){
+  document.getElementById(id).addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b)return;
+    [...document.querySelectorAll('#'+id+' button')].forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    if(key) S.cur[key]=vals?vals[[...b.parentNode.children].indexOf(b)]:b.textContent;
+  });
+}
+segWire('teeres','teeRes');
+segWire('pen','pen',[0,1,2]);
+segWire('updown','upDown');
+segWire('lie','lie');
+segWire('teeseg');
+document.getElementById('parpick').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  [...document.querySelectorAll('#parpick button')].forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); S.cur.par=+b.dataset.par;
+  document.getElementById('teecard').style.display=S.cur.par===3?'none':'block';
+});
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
+  if(c.textContent.startsWith('+'))return;
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on');
+}));
+
+/* ---------- nav ---------- */
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  const tabFor={home:'tab-home',rounds:'tab-rounds',more:'tab-more',review:'tab-rounds',newround:'tab-home',hole:'tab-home'};
+  document.querySelectorAll('.tabbar button').forEach(b=>b.classList.remove('on'));
+  const t=document.getElementById(tabFor[id]); if(t)t.classList.add('on');
+  window.scrollTo(0,0);
+}
+
+/* ---------- handicap config + toast ---------- */
+let HCAP=14, hcapTmp=14;
+function openHcap(){hcapTmp=HCAP;document.getElementById('hcapInput').value=hcapTmp;document.getElementById('hcapModal').classList.add('on');}
+function closeHcap(){document.getElementById('hcapModal').classList.remove('on');}
+function stepHcap(d){hcapTmp=Math.max(0,Math.min(36,hcapTmp+d));document.getElementById('hcapInput').value=hcapTmp;}
+function applyHcap(){HCAP=hcapTmp;document.getElementById('hcap').textContent='HCP '+HCAP;closeHcap();toast('Baseline updated · HCP '+HCAP);}
+let toastT;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),1800);}
+
+renderHome(); renderHistory();
+</script>
+</body>
+</html>
